@@ -1,0 +1,39 @@
+service:
+  name: authz-service
+  version: 1.0.0
+  port: 8002
+  host: 0.0.0.0
+  environment: development
+
+jwt:
+  secret: "your-secret-key-change-in-production"
+  algorithm: HS256
+  
+api:
+  key: "your-api-key-change-in-production"
+
+entity_service:
+  base_url: "http://localhost:8001"
+  timeout: 5.0
+  retry_attempts: 3
+  
+cache:
+  policy_ttl: 300  # 5 minutes
+  role_ttl: 120    # 2 minutes
+  decision_ttl: 30 # 30 seconds
+  max_size: 10000
+  
+rate_limit:
+  per_user: 1000
+  per_tenant: 10000
+  per_ip: 5000
+  window: 60  # seconds
+  
+cors:
+  allow_origins:
+    - "*"
+  allow_credentials: true
+  allow_methods:
+    - "*"
+  allow_headers:
+    - "*"
