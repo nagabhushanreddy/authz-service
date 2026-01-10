@@ -1,122 +1,76 @@
-"""
-Configuration management for authorization service.
-"""
-
 import os
-import yaml
 from pathlib import Path
-from typing import Dict, Any, Optional
-from pydantic import BaseModel, Field
-from pydantic_settings import BaseSettings
+from typing import Optional
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from utils import config, init_utils
 
 
-class ServiceConfig(BaseModel):
-    """Service configuration."""
-    name: str = "authz-service"
-    version: str = "1.0.0"
-    port: int = 8002
-    host: str = "0.0.0.0"
-    environment: str = "development"
+# Ensure utils-config reads from the service config directory (respects CONFIG_DIR override)
+CONFIG_DIR = Path(os.environ.get("CONFIG_DIR", "config"))
+init_utils(str(CONFIG_DIR))
+
+def _get_bool(key: str, default: bool) -> bool:
+    value = config.get(key, default)
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in {"true", "1", "yes", "on"}
+    return bool(value)
 
 
-class JWTConfig(BaseModel):
-    """JWT configuration."""
-    secret: str = Field(..., description="JWT secret key")
-    algorithm: str = "HS256"
+def _get_int(key: str, default: int) -> int:
+    try:
+        return int(config.get(key, default))
+    except (TypeError, ValueError):
+        return default
 
 
-class APIConfig(BaseModel):
-    """API configuration."""
-    key: str = Field(..., description="Service API key")
+def _get_float(key: str, default: float) -> float:
+    try:
+        return float(config.get(key, default))
+    except (TypeError, ValueError):
+        return default
 
 
-class EntityServiceConfig(BaseModel):
-    """Entity service configuration."""
-    base_url: str = "http://localhost:8001"
-    timeout: float = 5.0
-    retry_attempts: int = 3
+class Settings(BaseSettings):
+    """Authorization service settings loaded via utils.config defaults with env overrides."""
+
+    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True, extra="ignore")
+
+    # Service Configuration
+    SERVICE_NAME: str = config.get("service.name", "authz-service")
+    SERVICE_VERSION: str = config.get("service.version", "1.0.0")
+    ENVIRONMENT: str = config.get("service.environment", "development")
+    HOST: str = config.get("server.host", "0.0.0.0")
+    PORT: int = _get_int("server.port", 8001)
+    WORKERS: int = _get_int("service.workers", 4)
+    DEBUG: bool = _get_bool("service.debug", True)
+
+    # Security Configuration
+    JWT_SECRET_KEY: str = config.get("jwt.access_secret", "your-secret-key-change-in-production")
+    JWT_ALGORITHM: str = config.get("jwt.algorithm", "HS256")
+    API_KEY_HEADER: str = config.get("api_key.header", "X-API-Key")
+
+    # Entity Service Configuration
+    ENTITY_SERVICE_URL: str = config.get("external_services.entity_service.url", "http://localhost:8002")
+    ENTITY_SERVICE_TIMEOUT: int = _get_int("external_services.entity_service.timeout", 10)
+    ENTITY_SERVICE_RETRY_ATTEMPTS: int = _get_int("external_services.entity_service.retry_attempts", 3)
+
+    # Cache Configuration
+    CACHE_TTL_SECONDS: int = _get_int("cache.ttl_seconds", 3600)
+    CACHE_ENABLED: bool = _get_bool("cache.enabled", True)
+
+    # Logging Configuration
+    LOG_LEVEL: str = config.get("logging.level", "INFO")
+    LOG_FORMAT: str = config.get("logging.format", "json")
+
+    # Database Configuration (optional)
+    DATABASE_URL: Optional[str] = config.get("database.url")
 
 
-class CacheConfig(BaseModel):
-    """Cache configuration."""
-    policy_ttl: int = 300  # 5 minutes
-    role_ttl: int = 120  # 2 minutes
-    decision_ttl: int = 30  # 30 seconds
-    max_size: int = 10000
+def get_settings() -> Settings:
+    return Settings()
 
 
-class RateLimitConfig(BaseModel):
-    """Rate limit configuration."""
-    per_user: int = 1000
-    per_tenant: int = 10000
-    per_ip: int = 5000
-    window: int = 60  # seconds
-
-
-class CORSConfig(BaseModel):
-    """CORS configuration."""
-    allow_origins: list = ["*"]
-    allow_credentials: bool = True
-    allow_methods: list = ["*"]
-    allow_headers: list = ["*"]
-
-
-class AppConfig(BaseSettings):
-    """Application configuration."""
-    service: ServiceConfig = Field(default_factory=ServiceConfig)
-    jwt: JWTConfig
-    api: APIConfig
-    entity_service: EntityServiceConfig = Field(default_factory=EntityServiceConfig)
-    cache: CacheConfig = Field(default_factory=CacheConfig)
-    rate_limit: RateLimitConfig = Field(default_factory=RateLimitConfig)
-    cors: CORSConfig = Field(default_factory=CORSConfig)
-
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = False
-
-    @classmethod
-    def load_from_yaml(cls, config_path: str = "config/app.yaml") -> "AppConfig":
-        """Load configuration from YAML file."""
-        config_file = Path(config_path)
-        
-        if not config_file.exists():
-            raise FileNotFoundError(f"Configuration file not found: {config_path}")
-        
-        with open(config_file, 'r') as f:
-            config_data = yaml.safe_load(f)
-        
-        # Override with environment variables
-        jwt_secret = os.getenv("JWT_SECRET", config_data.get("jwt", {}).get("secret"))
-        api_key = os.getenv("API_KEY", config_data.get("api", {}).get("key"))
-        entity_service_url = os.getenv("ENTITY_SERVICE_URL", 
-                                       config_data.get("entity_service", {}).get("base_url"))
-        
-        if jwt_secret:
-            config_data.setdefault("jwt", {})["secret"] = jwt_secret
-        if api_key:
-            config_data.setdefault("api", {})["key"] = api_key
-        if entity_service_url:
-            config_data.setdefault("entity_service", {})["base_url"] = entity_service_url
-        
-        return cls(**config_data)
-
-
-# Global config instance
-_config: Optional[AppConfig] = None
-
-
-def get_config() -> AppConfig:
-    """Get global configuration instance."""
-    global _config
-    if _config is None:
-        _config = AppConfig.load_from_yaml()
-    return _config
-
-
-def reload_config() -> AppConfig:
-    """Reload configuration from file."""
-    global _config
-    _config = AppConfig.load_from_yaml()
-    return _config
+settings = get_settings()

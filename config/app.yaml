@@ -1,33 +1,54 @@
 service:
-  name: authz-service
-  version: 1.0.0
-  port: 8002
-  host: 0.0.0.0
-  environment: development
+  name: ${APP_NAME:authz-service}
+  version: ${APP_VERSION:1.0.0}
+  environment: ${ENVIRONMENT:development}
+  debug: ${DEBUG:false}
 
+server:
+  host: ${HOST:0.0.0.0}
+  port: ${PORT:3002}
+
+# External Service URLs
+external_services:
+  entity_service:
+    url: ${ENTITY_SERVICE_URL:http://localhost:8000}
+    timeout: ${ENTITY_SERVICE_TIMEOUT:5}
+
+# JWT Configuration
 jwt:
-  secret: "your-secret-key-change-in-production"
-  algorithm: HS256
-  
-api:
-  key: "your-api-key-change-in-production"
+  access_secret: ${JWT_ACCESS_SECRET:your-super-secret-access-key-min-32-chars}
+  algorithm: ${JWT_ALGORITHM:HS256}
 
-entity_service:
-  base_url: "http://localhost:8001"
-  timeout: 5.0
-  retry_attempts: 3
-  
+# API Key
+api:
+  key: ${API_KEY:your-api-key-change-in-production}
+
+# Policy Decision Caching
 cache:
-  policy_ttl: 300  # 5 minutes
-  role_ttl: 120    # 2 minutes
-  decision_ttl: 30 # 30 seconds
-  max_size: 10000
-  
-rate_limit:
-  per_user: 1000
-  per_tenant: 10000
-  per_ip: 5000
-  window: 60  # seconds
+  policy_ttl: ${CACHE_POLICY_TTL:300}
+  role_ttl: ${CACHE_ROLE_TTL:120}
+  decision_ttl: ${CACHE_DECISION_TTL:30}
+  max_size: ${CACHE_MAX_SIZE:10000}
+
+# Rate Limiting
+rate_limiting:
+  enabled: ${RATE_LIMITING_ENABLED:true}
+  max_requests_per_user: ${RATE_LIMIT_MAX_USER:1000}
+  max_requests_per_tenant: ${RATE_LIMIT_MAX_TENANT:10000}
+  max_requests_per_ip: ${RATE_LIMIT_MAX_IP:5000}
+  window_seconds: ${RATE_LIMIT_WINDOW:60}
+
+# Correlation ID
+correlation_id:
+  enabled: ${CORRELATION_ID_ENABLED:true}
+  header_name: ${CORRELATION_ID_HEADER:x-correlation-id}
+
+# API Documentation
+api_docs:
+  enabled: ${API_DOCS_ENABLED:true}
+  title: ${API_TITLE:Authorization Service API}
+  version: ${API_VERSION:1.0.0}
+  description: ${API_DESCRIPTION:Policy Decision Point (PDP) for authorization}
   
 cors:
   allow_origins:

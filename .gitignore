@@ -1,49 +1,124 @@
-# Python
+# =======================================
+# Python Microservices .gitignore Template
+# =======================================
+
+### Environment Configuration
+.env
+.env.local
+.env.*.local
+!.env.example
+
+### Virtual Environments
+venv/
+env/
+ENV/
+.venv/
+.virtualenv/
+python-venv/
+
+### IDE & Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+.vim/
+.emacs*
+*.iml
+
+### Python Bytecode & Cache
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
+*.egg-info/
 .eggs/
+dist/
+build/
+*.egg
+MANIFEST
+
+### Testing & Coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+### IDE Cache
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+### Installation
 lib/
 lib64/
 parts/
 sdist/
 var/
 wheels/
-*.egg-info/
-.installed.cfg
-*.egg
+pip-wheel-metadata/
+share/python-wheels/
 
-# Virtual environments
-venv/
-env/
-ENV/
-.venv
+### PEP 582
+__pypackages__/
 
-# Testing
-.pytest_cache/
-.coverage
-htmlcov/
+### Celery
+celerybeat-schedule
+celerybeat.pid
+
+### Database Files
+*.db
+*.sqlite
+*.sqlite3
+*.pkl
+*.pickle
+*.json (only for local test data, not config)
+
+### Logs & Reports
+logs/
 reports/
 *.log
+*.log.*
+*.out
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
+### IDE Run Configurations
+.run/
+
+### macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+### Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+### Linux
+.directory
 *~
 
-# OS
-.DS_Store
-Thumbs.db
+### Runtime Generated Files
+.cache/
+tmp/
+temp/
+*.tmp
+*.bak
 
-# Logs
-logs/
-*.log
+### OS Specific Files
+.vscode-server/
