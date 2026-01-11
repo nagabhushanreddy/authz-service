@@ -234,11 +234,11 @@ def get_entity_client() -> EntityServiceClient:
     """Get global entity service client instance."""
     global _client
     if _client is None:
-        from app.config import get_config
-        config = get_config()
+        from app.config import get_settings
+        config = get_settings()
         _client = EntityServiceClient(
-            base_url=config.entity_service.base_url,
-            timeout=config.entity_service.timeout,
-            retry_attempts=config.entity_service.retry_attempts
+            base_url=config.ENTITY_SERVICE_URL,
+            timeout=config.ENTITY_SERVICE_TIMEOUT,
+            retry_attempts=config.ENTITY_SERVICE_RETRY_ATTEMPTS
         )
     return _client

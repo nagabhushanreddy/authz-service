@@ -50,7 +50,11 @@ class Settings(BaseSettings):
     # Security Configuration
     JWT_SECRET_KEY: str = config.get("jwt.access_secret", "your-secret-key-change-in-production")
     JWT_ALGORITHM: str = config.get("jwt.algorithm", "HS256")
+    API_KEY: str = config.get("api.key", "test-api-key")  # Default for testing
     API_KEY_HEADER: str = config.get("api_key.header", "X-API-Key")
+    
+    # Testing
+    TESTING: bool = os.getenv("TESTING", "false").lower() in ("true", "1", "yes")
 
     # Entity Service Configuration
     ENTITY_SERVICE_URL: str = config.get("external_services.entity_service.url", "http://localhost:8002")

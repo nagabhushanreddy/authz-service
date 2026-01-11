@@ -40,7 +40,8 @@ app.add_middleware(LoggingMiddleware)
 app.add_middleware(
     AuthenticationMiddleware,
     jwt_secret=settings.JWT_SECRET_KEY,
-    jwt_algorithm=settings.JWT_ALGORITHM
+    jwt_algorithm=settings.JWT_ALGORITHM,
+    api_key=settings.API_KEY
 )
 app.add_middleware(RequestContextMiddleware)
 

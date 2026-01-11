@@ -4,7 +4,7 @@ Caching layer for authorization service.
 
 import time
 from typing import Dict, Any, Optional, List
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from collections import OrderedDict
 from threading import Lock
 import logging
@@ -23,11 +23,11 @@ class CacheEntry:
             ttl: Time to live in seconds
         """
         self.value = value
-        self.expiry = datetime.utcnow() + timedelta(seconds=ttl)
+        self.expiry = datetime.now(timezone.utc) + timedelta(seconds=ttl)
     
     def is_expired(self) -> bool:
         """Check if cache entry is expired."""
-        return datetime.utcnow() > self.expiry
+        return datetime.now(timezone.utc) > self.expiry
 
 
 class LRUCache:
@@ -274,12 +274,12 @@ def get_cache() -> PolicyCache:
     """Get global cache instance."""
     global _cache
     if _cache is None:
-        from app.config import get_config
-        config = get_config()
+        from app.config import get_settings
+        config = get_settings()
         _cache = PolicyCache(
-            policy_ttl=config.cache.policy_ttl,
-            role_ttl=config.cache.role_ttl,
-            decision_ttl=config.cache.decision_ttl,
-            max_size=config.cache.max_size
+            policy_ttl=config.CACHE_TTL_SECONDS,
+            role_ttl=config.CACHE_TTL_SECONDS,
+            decision_ttl=config.CACHE_TTL_SECONDS,
+            max_size=1000  # Default max size
         )
     return _cache

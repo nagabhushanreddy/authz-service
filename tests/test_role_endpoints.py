@@ -8,9 +8,9 @@ from fastapi import status
 
 
 @pytest.mark.unit
-def test_list_roles_without_auth(test_client):
+def test_list_roles_without_auth(test_client_no_auth):
     """Test listing roles without authentication."""
-    response = test_client.get("/api/v1/authz/roles")
+    response = test_client_no_auth.get("/api/v1/authz/roles")
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 

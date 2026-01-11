@@ -5,7 +5,7 @@ Assignment service for user-role and role-permission assignments.
 import logging
 from typing import List, Dict, Any, Optional
 from uuid import UUID
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.clients import get_entity_client
 from app.cache import get_cache
@@ -48,7 +48,7 @@ class AssignmentService:
             tenant_id=assignment_data.tenant_id,
             valid_from=assignment_data.valid_from,
             valid_until=assignment_data.valid_until,
-            created_at=result.get("created_at", datetime.utcnow())
+            created_at=result.get("created_at", datetime.now(timezone.utc))
         )
     
     async def get_user_roles(self, user_id: UUID, tenant_id: Optional[UUID] = None, 
@@ -76,8 +76,8 @@ class AssignmentService:
                 description=role.get("description"),
                 tenant_id=role.get("tenant_id"),
                 permissions=permission_summaries,
-                created_at=role.get("created_at", datetime.utcnow()),
-                updated_at=role.get("updated_at", datetime.utcnow())
+                created_at=role.get("created_at", datetime.now(timezone.utc)),
+                updated_at=role.get("updated_at", datetime.now(timezone.utc))
             ))
         
         return role_responses
@@ -110,7 +110,7 @@ class AssignmentService:
             assignment_id=result.get("assignment_id"),
             role_id=role_id,
             permission_id=assignment_data.permission_id,
-            created_at=result.get("created_at", datetime.utcnow())
+            created_at=result.get("created_at", datetime.now(timezone.utc))
         )
     
     async def get_role_permissions(self, role_id: UUID) -> List[PermissionResponse]:
@@ -126,8 +126,8 @@ class AssignmentService:
                 resource_type=p.get("resource_type"),
                 action=p.get("action"),
                 conditions=p.get("conditions", {}),
-                created_at=p.get("created_at", datetime.utcnow()),
-                updated_at=p.get("updated_at", datetime.utcnow())
+                created_at=p.get("created_at", datetime.now(timezone.utc)),
+                updated_at=p.get("updated_at", datetime.now(timezone.utc))
             )
             for p in permissions
         ]

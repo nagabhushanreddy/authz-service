@@ -6,7 +6,7 @@ import logging
 import hashlib
 from typing import Dict, Any, List, Optional
 from uuid import UUID
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.models.request import AuthorizationRequest
 from app.models.response import DecisionType, AuthorizationResponse, ResponseMetadata
@@ -58,7 +58,7 @@ class DecisionService:
             policy_version=self.policy_version,
             evaluated_policies=evaluated_policies,
             metadata=ResponseMetadata(
-                timestamp=datetime.utcnow(),
+                timestamp=datetime.now(timezone.utc),
                 correlation_id=get_correlation_id() or None
             )
         )

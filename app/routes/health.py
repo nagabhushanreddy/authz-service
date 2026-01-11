@@ -3,7 +3,7 @@ Health check endpoints.
 """
 
 from fastapi import APIRouter, status
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.config import settings
 
@@ -23,5 +23,5 @@ async def health_check():
         "service": settings.SERVICE_NAME,
         "version": settings.SERVICE_VERSION,
         "environment": settings.ENVIRONMENT,
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }

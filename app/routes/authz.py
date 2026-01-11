@@ -5,7 +5,7 @@ Authorization decision endpoints.
 import logging
 from typing import List
 from fastapi import APIRouter, HTTPException, status
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.models.request import AuthorizationRequest, BatchAuthorizationRequest
 from app.models.response import (
@@ -75,7 +75,7 @@ async def batch_check_authorization(request: BatchAuthorizationRequest):
         return BatchAuthorizationResponse(
             decisions=decisions,
             metadata=ResponseMetadata(
-                timestamp=datetime.utcnow(),
+                timestamp=datetime.now(timezone.utc),
                 correlation_id=get_correlation_id() or None
             )
         )

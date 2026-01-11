@@ -5,7 +5,7 @@ Policy service for policy management operations.
 import logging
 from typing import Optional, Dict, Any
 from uuid import UUID
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.clients import get_entity_client
 from app.cache import get_cache
@@ -114,8 +114,8 @@ class PolicyService:
             rules=policy_dict.get("rules", []),
             active=policy_dict.get("active", True),
             version=policy_dict.get("version"),
-            created_at=policy_dict.get("created_at", datetime.utcnow()),
-            updated_at=policy_dict.get("updated_at", datetime.utcnow())
+            created_at=policy_dict.get("created_at", datetime.now(timezone.utc)),
+            updated_at=policy_dict.get("updated_at", datetime.now(timezone.utc))
         )
 
 

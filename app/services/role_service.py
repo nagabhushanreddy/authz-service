@@ -5,7 +5,7 @@ Role service for role management operations.
 import logging
 from typing import Optional, List, Dict, Any
 from uuid import UUID
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.clients import get_entity_client
 from app.cache import get_cache
@@ -165,8 +165,8 @@ class RoleService:
             description=role_dict.get("description"),
             tenant_id=role_dict.get("tenant_id"),
             permissions=permission_summaries,
-            created_at=role_dict.get("created_at", datetime.utcnow()),
-            updated_at=role_dict.get("updated_at", datetime.utcnow())
+            created_at=role_dict.get("created_at", datetime.now(timezone.utc)),
+            updated_at=role_dict.get("updated_at", datetime.now(timezone.utc))
         )
 
 

@@ -5,7 +5,7 @@ Permission service for permission management operations.
 import logging
 from typing import Optional, Dict, Any
 from uuid import UUID
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.clients import get_entity_client
 from app.cache import get_cache
@@ -93,8 +93,8 @@ class PermissionService:
             resource_type=permission_dict.get("resource_type"),
             action=permission_dict.get("action"),
             conditions=permission_dict.get("conditions", {}),
-            created_at=permission_dict.get("created_at", datetime.utcnow()),
-            updated_at=permission_dict.get("updated_at", datetime.utcnow())
+            created_at=permission_dict.get("created_at", datetime.now(timezone.utc)),
+            updated_at=permission_dict.get("updated_at", datetime.now(timezone.utc))
         )
 
 

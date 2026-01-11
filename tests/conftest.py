@@ -8,9 +8,10 @@ from typing import AsyncGenerator, Dict, Any
 from uuid import uuid4
 from httpx import AsyncClient
 from fastapi.testclient import TestClient
+from unittest.mock import AsyncMock, patch
 
 from main import app
-from app.config import get_config
+from app.config import get_settings
 from app.cache import get_cache
 from app.models.request import AuthorizationRequest, AuthorizationContext, ActionType
 
@@ -26,12 +27,24 @@ def event_loop():
 @pytest.fixture
 def test_config():
     """Get test configuration."""
-    return get_config()
+    return get_settings()
 
 
 @pytest.fixture
-def test_client():
-    """Create test client."""
+def test_client(monkeypatch):
+    """Create test client with authentication disabled via TESTING flag."""
+    # Enable testing mode to bypass authentication
+    monkeypatch.setenv("TESTING", "true")
+    # Force reload of settings to pick up the env var
+    from app.config import Settings
+    monkeypatch.setattr("app.config.settings", Settings())
+    
+    return TestClient(app)
+
+
+@pytest.fixture
+def test_client_no_auth():
+    """Create test client WITHOUT mocked authentication for testing auth failures."""
     return TestClient(app)
 
 
@@ -47,7 +60,7 @@ def auth_headers(test_config) -> Dict[str, str]:
     """Create authentication headers with valid JWT."""
     # For testing, use API key authentication
     return {
-        "X-API-Key": test_config.api.key,
+        "X-API-Key": "test-api-key",
         "X-Correlation-ID": str(uuid4())
     }
 

@@ -8,9 +8,9 @@ from fastapi import status
 
 
 @pytest.mark.unit
-def test_check_authorization_missing_auth(test_client):
+def test_check_authorization_missing_auth(test_client_no_auth):
     """Test authorization check without authentication."""
-    response = test_client.post(
+    response = test_client_no_auth.post(
         "/api/v1/authz/check",
         json={
             "user_id": str(uuid4()),
