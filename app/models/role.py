@@ -4,7 +4,7 @@ Role models for authorization service.
 
 from typing import Optional, List
 from datetime import datetime
-from pydantic import BaseModel, Field, UUID4
+from pydantic import BaseModel, Field, UUID4, ConfigDict
 
 
 class PermissionSummary(BaseModel):
@@ -26,15 +26,16 @@ class RoleCreate(RoleBase):
     """Role creation model."""
     permissions: Optional[List[UUID4]] = Field(default_factory=list, description="List of permission IDs")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
+
             "example": {
                 "name": "loan_officer",
                 "description": "Can manage loans",
                 "tenant_id": "123e4567-e89b-12d3-a456-426614174000",
                 "permissions": ["123e4567-e89b-12d3-a456-426614174001"]
             }
-        }
+        })
 
 
 class RoleUpdate(BaseModel):
@@ -43,14 +44,15 @@ class RoleUpdate(BaseModel):
     description: Optional[str] = Field(None, max_length=500, description="Role description")
     permissions: Optional[List[UUID4]] = Field(None, description="List of permission IDs (replaces all)")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
+
             "example": {
                 "name": "senior_loan_officer",
                 "description": "Can manage and approve loans",
                 "permissions": ["123e4567-e89b-12d3-a456-426614174001", "123e4567-e89b-12d3-a456-426614174002"]
             }
-        }
+        })
 
 
 class RoleResponse(RoleBase):
@@ -60,8 +62,9 @@ class RoleResponse(RoleBase):
     created_at: datetime = Field(..., description="Creation timestamp")
     updated_at: datetime = Field(..., description="Last update timestamp")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
+
             "example": {
                 "role_id": "123e4567-e89b-12d3-a456-426614174000",
                 "name": "loan_officer",
@@ -78,7 +81,7 @@ class RoleResponse(RoleBase):
                 "created_at": "2026-01-10T10:30:00Z",
                 "updated_at": "2026-01-10T10:30:00Z"
             }
-        }
+        })
 
 
 class PaginationMetadata(BaseModel):
@@ -94,8 +97,9 @@ class RoleListResponse(BaseModel):
     roles: List[RoleResponse] = Field(..., description="List of roles")
     pagination: PaginationMetadata = Field(..., description="Pagination metadata")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
+
             "example": {
                 "roles": [
                     {
@@ -115,4 +119,4 @@ class RoleListResponse(BaseModel):
                     "total_pages": 1
                 }
             }
-        }
+        })

@@ -4,7 +4,7 @@ Permission models for authorization service.
 
 from typing import Optional, List, Dict, Any
 from datetime import datetime
-from pydantic import BaseModel, Field, UUID4
+from pydantic import BaseModel, Field, UUID4, ConfigDict
 
 
 class PermissionBase(BaseModel):
@@ -19,8 +19,9 @@ class PermissionBase(BaseModel):
 class PermissionCreate(PermissionBase):
     """Permission creation model."""
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
+
             "example": {
                 "name": "loan:read",
                 "description": "Read loan information",
@@ -31,7 +32,7 @@ class PermissionCreate(PermissionBase):
                     "max_amount": 1000000
                 }
             }
-        }
+        })
 
 
 class PermissionUpdate(BaseModel):
@@ -40,8 +41,9 @@ class PermissionUpdate(BaseModel):
     description: Optional[str] = Field(None, max_length=500, description="Permission description")
     conditions: Optional[Dict[str, Any]] = Field(None, description="ABAC conditions")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
+
             "example": {
                 "description": "Read and export loan information",
                 "conditions": {
@@ -49,7 +51,7 @@ class PermissionUpdate(BaseModel):
                     "max_amount": 2000000
                 }
             }
-        }
+        })
 
 
 class PermissionResponse(PermissionBase):
@@ -58,8 +60,9 @@ class PermissionResponse(PermissionBase):
     created_at: datetime = Field(..., description="Creation timestamp")
     updated_at: datetime = Field(..., description="Last update timestamp")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
+
             "example": {
                 "permission_id": "123e4567-e89b-12d3-a456-426614174000",
                 "name": "loan:read",
@@ -70,7 +73,7 @@ class PermissionResponse(PermissionBase):
                 "created_at": "2026-01-10T10:30:00Z",
                 "updated_at": "2026-01-10T10:30:00Z"
             }
-        }
+        })
 
 
 class PaginationMetadata(BaseModel):
@@ -86,8 +89,9 @@ class PermissionListResponse(BaseModel):
     permissions: List[PermissionResponse] = Field(..., description="List of permissions")
     pagination: PaginationMetadata = Field(..., description="Pagination metadata")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
+
             "example": {
                 "permissions": [
                     {
@@ -108,4 +112,4 @@ class PermissionListResponse(BaseModel):
                     "total_pages": 1
                 }
             }
-        }
+        })

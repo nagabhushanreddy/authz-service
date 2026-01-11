@@ -4,7 +4,7 @@ Response models for authorization service.
 
 from typing import Optional, List, Dict, Any, Generic, TypeVar
 from datetime import datetime
-from pydantic import BaseModel, Field, UUID4
+from pydantic import BaseModel, Field, UUID4, ConfigDict
 from enum import Enum
 
 
@@ -19,13 +19,14 @@ class ResponseMetadata(BaseModel):
     timestamp: datetime = Field(default_factory=datetime.utcnow, description="Response timestamp")
     correlation_id: Optional[UUID4] = Field(None, description="Request correlation ID")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
+
             "example": {
                 "timestamp": "2026-01-10T10:30:00Z",
                 "correlation_id": "123e4567-e89b-12d3-a456-426614174000"
             }
-        }
+        })
 
 
 class AuthorizationResponse(BaseModel):
@@ -36,8 +37,9 @@ class AuthorizationResponse(BaseModel):
     evaluated_policies: List[str] = Field(default_factory=list, description="List of policy IDs evaluated")
     metadata: ResponseMetadata = Field(default_factory=ResponseMetadata, description="Response metadata")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
+
             "example": {
                 "decision": "ALLOW",
                 "reason_codes": ["RBAC_MATCH", "ROLE_ADMIN"],
@@ -48,7 +50,7 @@ class AuthorizationResponse(BaseModel):
                     "correlation_id": "123e4567-e89b-12d3-a456-426614174000"
                 }
             }
-        }
+        })
 
 
 class DecisionResponse(BaseModel):
@@ -58,15 +60,16 @@ class DecisionResponse(BaseModel):
     policy_version: str = Field(..., description="Version of policies evaluated")
     request_index: int = Field(..., description="Index of request in batch")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
+
             "example": {
                 "decision": "ALLOW",
                 "reason_codes": ["RBAC_MATCH"],
                 "policy_version": "1.0.0",
                 "request_index": 0
             }
-        }
+        })
 
 
 class BatchAuthorizationResponse(BaseModel):
@@ -74,8 +77,9 @@ class BatchAuthorizationResponse(BaseModel):
     decisions: List[DecisionResponse] = Field(..., description="List of authorization decisions")
     metadata: ResponseMetadata = Field(default_factory=ResponseMetadata, description="Response metadata")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
+
             "example": {
                 "decisions": [
                     {
@@ -96,7 +100,7 @@ class BatchAuthorizationResponse(BaseModel):
                     "correlation_id": "123e4567-e89b-12d3-a456-426614174000"
                 }
             }
-        }
+        })
 
 
 T = TypeVar('T')
@@ -109,8 +113,9 @@ class StandardResponse(BaseModel, Generic[T]):
     error: Optional['ErrorDetail'] = Field(None, description="Error details if unsuccessful")
     metadata: ResponseMetadata = Field(default_factory=ResponseMetadata, description="Response metadata")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
+
             "example": {
                 "success": True,
                 "data": {"id": "123"},
@@ -120,7 +125,7 @@ class StandardResponse(BaseModel, Generic[T]):
                     "correlation_id": "123e4567-e89b-12d3-a456-426614174000"
                 }
             }
-        }
+        })
 
 
 class ErrorDetail(BaseModel):
@@ -129,14 +134,15 @@ class ErrorDetail(BaseModel):
     message: str = Field(..., description="Human-readable error message")
     details: Optional[Dict[str, Any]] = Field(None, description="Additional error details")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
+
             "example": {
                 "code": "INVALID_REQUEST",
                 "message": "Invalid request format",
                 "details": {"field": "user_id", "error": "Invalid UUID format"}
             }
-        }
+        })
 
 
 class ErrorResponse(BaseModel):
@@ -146,8 +152,9 @@ class ErrorResponse(BaseModel):
     error: ErrorDetail = Field(..., description="Error details")
     metadata: ResponseMetadata = Field(default_factory=ResponseMetadata, description="Response metadata")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
+
             "example": {
                 "success": False,
                 "data": None,
@@ -161,4 +168,4 @@ class ErrorResponse(BaseModel):
                     "correlation_id": "123e4567-e89b-12d3-a456-426614174000"
                 }
             }
-        }
+        })

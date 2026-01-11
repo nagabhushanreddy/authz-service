@@ -84,7 +84,7 @@ def test_check_authorization_invalid_request(test_client, auth_headers):
         headers=auth_headers
     )
     
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
 
 
 @pytest.mark.unit
@@ -105,4 +105,4 @@ def test_batch_check_too_many_requests(test_client, auth_headers, sample_user_id
         headers=auth_headers
     )
     
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT

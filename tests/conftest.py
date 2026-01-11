@@ -17,7 +17,7 @@ from app.models.request import AuthorizationRequest, AuthorizationContext, Actio
 
 
 @pytest.fixture(scope="session")
-def event_loop():
+def event_loop_fixture():
     """Create event loop for async tests."""
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop

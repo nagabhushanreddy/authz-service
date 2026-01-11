@@ -4,7 +4,7 @@ Policy models for authorization service.
 
 from typing import Optional, List, Dict, Any
 from datetime import datetime
-from pydantic import BaseModel, Field, UUID4
+from pydantic import BaseModel, Field, UUID4, ConfigDict
 from enum import Enum
 
 
@@ -27,8 +27,9 @@ class Rule(BaseModel):
     conditions: Dict[str, Any] = Field(..., description="Rule evaluation conditions")
     priority: int = Field(..., ge=0, le=1000, description="Rule priority (0-1000)")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
+
             "example": {
                 "effect": "allow",
                 "conditions": {
@@ -38,7 +39,7 @@ class Rule(BaseModel):
                 },
                 "priority": 100
             }
-        }
+        })
 
 
 class PolicyBase(BaseModel):
@@ -55,8 +56,9 @@ class PolicyBase(BaseModel):
 class PolicyCreate(PolicyBase):
     """Policy creation model."""
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
+
             "example": {
                 "name": "loan_officer_policy",
                 "description": "Policy for loan officers",
@@ -75,7 +77,7 @@ class PolicyCreate(PolicyBase):
                 "active": True,
                 "version": "1.0.0"
             }
-        }
+        })
 
 
 class PolicyUpdate(BaseModel):
@@ -85,8 +87,9 @@ class PolicyUpdate(BaseModel):
     rules: Optional[List[Rule]] = Field(None, min_length=1, description="Policy rules")
     active: Optional[bool] = Field(None, description="Whether policy is active")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
+
             "example": {
                 "description": "Updated policy for senior loan officers",
                 "rules": [
@@ -109,7 +112,7 @@ class PolicyUpdate(BaseModel):
                 ],
                 "active": True
             }
-        }
+        })
 
 
 class PolicyResponse(PolicyBase):
@@ -118,8 +121,9 @@ class PolicyResponse(PolicyBase):
     created_at: datetime = Field(..., description="Creation timestamp")
     updated_at: datetime = Field(..., description="Last update timestamp")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
+
             "example": {
                 "policy_id": "123e4567-e89b-12d3-a456-426614174000",
                 "name": "loan_officer_policy",
@@ -138,7 +142,7 @@ class PolicyResponse(PolicyBase):
                 "created_at": "2026-01-10T10:30:00Z",
                 "updated_at": "2026-01-10T10:30:00Z"
             }
-        }
+        })
 
 
 class PaginationMetadata(BaseModel):
@@ -154,8 +158,9 @@ class PolicyListResponse(BaseModel):
     policies: List[PolicyResponse] = Field(..., description="List of policies")
     pagination: PaginationMetadata = Field(..., description="Pagination metadata")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
+
             "example": {
                 "policies": [
                     {
@@ -178,4 +183,4 @@ class PolicyListResponse(BaseModel):
                     "total_pages": 1
                 }
             }
-        }
+        })

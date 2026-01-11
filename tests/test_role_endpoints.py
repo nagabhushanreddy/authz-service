@@ -36,7 +36,7 @@ def test_create_role_invalid_data(test_client, auth_headers):
         },
         headers=auth_headers
     )
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
 
 
 @pytest.mark.unit
